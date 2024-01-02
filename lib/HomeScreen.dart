@@ -38,22 +38,53 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FutureBuilder(
                 future: notesList,
                 builder: (context, AsyncSnapshot<List<NotesModels>> snapshot) {
-                  return ListView.builder(
-                      itemCount: snapshot.data?.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(10),
-                          
-                          child: Card(
-                            margin: EdgeInsets.all(5),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(0),
-                              title:
-                                  Text(snapshot.data![index].title.toString()),
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onLongPress: () {
+                              dbHelper!.update(NotesModels(
+                                  id: snapshot.data![index].id!,
+                                  title: 'Vishal Notes',
+                                  age: 21,
+                                  description: 'Notes',
+                                  email: 'ABC@GMAIL.COM'));
+                              setState(() {
+                                notesList = dbHelper!.getNotesList();
+                              });
+                            },
+                            child: Dismissible(
+                              key: ValueKey<int>(snapshot.data![index].id!),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                color: Colors.red,
+                                child: const Icon(Icons.delete),
+                              ),
+                              onDismissed: (direction) {
+                                setState(() {
+                                  dbHelper!.delete(snapshot.data![index].id!);
+                                  print('data sucessfully deleted');
+                                  notesList = dbHelper!.getNotesList();
+                                  snapshot.data!.remove(snapshot.data![index]);
+                                });
+                              },
+                              child: Card(
+                                child: ListTile(
+                                  title: Text(
+                                      snapshot.data![index].title.toString()),
+                                  subtitle: Text(
+                                      snapshot.data![index].age.toString()),
+                                  trailing: Text(
+                                      snapshot.data![index].email.toString()),
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      });
+                          );
+                        });
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
                 }),
           ),
         ],
@@ -62,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           dbHelper!
               .insert(NotesModels(
-                  title: 'First Notes',
+                  title: 'Third Notes',
                   age: 22,
                   description: 'This is my first app',
                   email: 'vishalgupta@gmail.com'))
