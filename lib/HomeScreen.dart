@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onDismissed: (direction) {
                                 setState(() {
                                   dbHelper!.delete(snapshot.data![index].id!);
-                                  print('data sucessfully deleted');
+                                  debugPrint('data sucessfully deleted');
                                   notesList = dbHelper!.getNotesList();
                                   snapshot.data!.remove(snapshot.data![index]);
                                 });
@@ -98,12 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   description: 'This is my first app',
                   email: 'vishalgupta@gmail.com'))
               .then((value) {
-            print('Data added successfully');
+            debugPrint('Data added successfully');
             setState(() {
               notesList = dbHelper!.getNotesList();
             });
           }).onError((error, stackTrace) {
-            print(error.toString());
+            debugPrint(error.toString());
           });
         },
         child: const Icon(Icons.add),
